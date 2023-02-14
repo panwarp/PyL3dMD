@@ -1,0 +1,8 @@
+LAMMPS (21 Jul 2020)
+# THIS IS A SAMPLE of the LAMMPS INPUT SCRIPT TO GENERATE STATE at desired T, P (eqmT, eqmP).
+
+# Setup parameters
+variable            fluid index BlendUA
+variable       		T index 100
+log             	logEQM_${fluid}.out
+log             	logEQM_BlendUA.out
