@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 """
 Created on Thu December 10 11:41:02 2022
 
@@ -30,27 +29,30 @@ if __name__ == "__main__":
     """
     Define Input Parameters
     """
-    locationDataFile = 'C:/Usage/RunFromLocalComputer' # location of your LAMMPS data file
-    locationDumpFile = 'C:/Usage/RunFromLocalComputer' # location of your LAMMPS dump file
-    datafilename =  'sample.txt' # name of your LAMMPS data file
-    dumpfilename = 'sample.lammpstrj' # name of your LAMMPS dump file
+    # Mendatory Inputs
+    locationDataFile = 'C:/Usage/RunFromLocalComputer' # Location of your LAMMPS data file
+    locationDumpFile = 'C:/Usage/RunFromLocalComputer' # Location of your LAMMPS dump file
+    datafilename =  'sample.txt' # Name of your LAMMPS data file
+    dumpfilename = 'sample.lammpstrj' # Name of your LAMMPS dump file
     
-    # Optional Input
-    numberofcores = 16 # Number of processors to be used for parallel computing (deafult is maximum available)
-    whichdescriptors = 'set1' # Specify which set of descriptor you wan to calculate (default is 'all')
+    # Optional Inputs
+    numberofcores = 16 # Number of processors for parallel computing (default is maximum)
+    whichdescriptors = 'set1' # Specify which set of descriptor to calculate (default is 'all')
     
     """
     Calculate all descriptors
     """
-    datafile = locationDataFile + '/' + datafilename # your LAMMPS data file
-    dumpfile = locationDumpFile + '/' + dumpfilename # your LAMMPS dump file
+    datafile = locationDataFile + '/' + datafilename # Your LAMMPS data file
+    dumpfile = locationDumpFile + '/' + dumpfilename # Your LAMMPS dump file
     
-    # Without optional input: PyL3dMD will find and use maximum available processors for parallel computing
-    #                         and also calculate all descriptors if nothing is specified
+    ########################### WITHOUT OPTIONAL INPUTS #######################################
+    # PyL3dMD will find and use maximum available processors for parallel computing
+    # and also calculate all descriptors if nothing is specified
     # program = pyl3dmd.pyl3dmd(datafile, dumpfile)
     
-    # With optional input: PyL3dMD will use the defined number of processors for parallel computing
-    #                      and also calculate the defined set of descriptors if any is specified
+    ################################ WITHOUT INPUTS ###########################################
+    # PyL3dMD will use the defined number of processors for parallel computing
+    # and also calculate the defined set of descriptors if any is specified
     program = pyl3dmd.pyl3dmd(datafilename, dumpfilename, whichdescriptors='set1', numberofcores=16)
     
     # Start the calculation
