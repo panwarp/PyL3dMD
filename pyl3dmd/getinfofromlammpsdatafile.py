@@ -289,7 +289,7 @@ def builddihedralslist(adjList):
                             i = adjList[j][ii]
                             if i != k:
                                 ll = 0
-                                for ll in range (numConnections[ll]):
+                                for ll in range (numConnections[k]):
                                     l = adjList[k][ll]
                                     if l != j:
                                         dihedrals_list.append([i, j, k, l])

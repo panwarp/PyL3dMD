@@ -44,7 +44,7 @@ def removehydrogen(xyz, mass, bond, angle, dihedral):
         
         # Molecular matrix consist of x, y, z cartesian coordinates of the molecule
         M = np.delete(xyz, idxdeletexyz, 0) # Coordinates of only heavy atoms
-        
+            
         # Update bond table accordingly - Numpy check if elements of array belong to another array
         check = np.isin(bond, np.array(idxdeletexyz)+1)
         idxkeepbond = [i for i in range(len(check)) if np.all(check[i,:] == [False, False])]
@@ -59,6 +59,56 @@ def removehydrogen(xyz, mass, bond, angle, dihedral):
         check = np.isin(dihedral, np.array(idxdeletexyz)+1)
         idxkeepdihedral = [i for i in range(len(check)) if np.all(check[i,:] == [False, False, False, False])]
         dihedralheavy = dihedral[idxkeepdihedral,:] # Dihedralheavy = between only heavy atoms
+        
+        
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in bondheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the bond list with the new IDs
+        new_bond_list = []
+        for atom1, atom2 in bondheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_bond_list.append((new_atom1, new_atom2))
+        
+        bondheavy = np.array(new_bond_list)
+        
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in angleheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the angle list with the new IDs
+        new_angle_list = []
+        for atom1, atom2, atom3 in angleheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_atom3 = id_map[atom3]
+            new_angle_list.append((new_atom1, new_atom2, new_atom3))
+        
+        angleheavy = np.array(new_angle_list)
+      
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in dihedralheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the dihedral list with the new IDs
+        new_dihedral_list = []
+        for atom1, atom2, atom3, atom4 in dihedralheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_atom3 = id_map[atom3]
+            new_atom4 = id_map[atom4]
+            new_dihedral_list.append((new_atom1, new_atom2, new_atom3, new_atom4))
+        
+        dihedralheavy = np.array(new_dihedral_list)
+
     else:
         # If no heavy atoms then keep as it is
         massheavy = mass

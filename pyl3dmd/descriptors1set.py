@@ -27,13 +27,13 @@ You should have received a copy of the GNU General Public License
 import numpy as np
 
 def caltopologyconnectivitydescriptors(xyz, mass, bond, angle, dihedral, adjMat, disMat):
-    TCdes = {}
-    
+    TCdes = {}    
     massheavy, M, bondheavy, angleheavy, dihedralheavy = removehydrogen(xyz, mass, bond, angle, dihedral)
     G, Gx, Gy, Gz = calgeometricdistancematrix(M)
     Ginv, Ginv2 = calinversegeometricdistancematrix(G)
     
     disMat3D = G
+    #print(np.shape(adjMat))
     nA = len(massheavy)
     nB = len(bondheavy)
     #verMat = calvertexmatrix(adjMat)
@@ -108,7 +108,7 @@ def removehydrogen(xyz, mass, bond, angle, dihedral):
         
         # Molecular matrix consist of x, y, z cartesian coordinates of the molecule
         M = np.delete(xyz, idxdeletexyz, 0) # Coordinates of only heavy atoms
-        
+            
         # Update bond table accordingly - Numpy check if elements of array belong to another array
         check = np.isin(bond, np.array(idxdeletexyz)+1)
         idxkeepbond = [i for i in range(len(check)) if np.all(check[i,:] == [False, False])]
@@ -123,6 +123,56 @@ def removehydrogen(xyz, mass, bond, angle, dihedral):
         check = np.isin(dihedral, np.array(idxdeletexyz)+1)
         idxkeepdihedral = [i for i in range(len(check)) if np.all(check[i,:] == [False, False, False, False])]
         dihedralheavy = dihedral[idxkeepdihedral,:] # Dihedralheavy = between only heavy atoms
+        
+        
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in bondheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the bond list with the new IDs
+        new_bond_list = []
+        for atom1, atom2 in bondheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_bond_list.append((new_atom1, new_atom2))
+        
+        bondheavy = np.array(new_bond_list)
+        
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in angleheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the angle list with the new IDs
+        new_angle_list = []
+        for atom1, atom2, atom3 in angleheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_atom3 = id_map[atom3]
+            new_angle_list.append((new_atom1, new_atom2, new_atom3))
+        
+        angleheavy = np.array(new_angle_list)
+      
+        # Get a list of all atom IDs # sorted(list(set([a for b in bondheavy for a in b])))
+        atom_ids = list(set([a for b in dihedralheavy for a in b]))
+        
+        # Create a dictionary to map old IDs to new IDs
+        id_map = {old_id: new_id for new_id, old_id in enumerate(atom_ids, start=1)}
+        
+        # Update the dihedral list with the new IDs
+        new_dihedral_list = []
+        for atom1, atom2, atom3, atom4 in dihedralheavy:
+            new_atom1 = id_map[atom1]
+            new_atom2 = id_map[atom2]
+            new_atom3 = id_map[atom3]
+            new_atom4 = id_map[atom4]
+            new_dihedral_list.append((new_atom1, new_atom2, new_atom3, new_atom4))
+        
+        dihedralheavy = np.array(new_dihedral_list)
+
     else:
         # If no heavy atoms then keep as it is
         massheavy = mass
@@ -131,6 +181,64 @@ def removehydrogen(xyz, mass, bond, angle, dihedral):
         angleheavy = angle
         dihedralheavy = dihedral
     return (massheavy, M, bondheavy, angleheavy, dihedralheavy)
+
+def multModSquareMatrices(M,N):
+    """
+    Modified matrix-matrix multiplication of sqaure matrices
+    # Ref - https://imada.sdu.dk/~rolf/Edu/DM534/E16/IntroCS2016-final.pdf
+    size = len(M)
+    result = [[inf for x in range(size)] for y in range(size)]
+
+    for i in range(size):
+        for j in range(size):
+            for k in range(size):
+                result[i][j] = min(result[i][j], M[i][k] + N[k][j])
+    """
+    size = len(M)
+    result = np.zeros([size,size])*np.inf
+    for i in range(size):
+        result[i][:] = np.min(M[i] + N.T, axis=1)
+    return result
+
+
+
+def caladjacencymatrix(bonds):
+    """
+    Calculate adjacency matrix from bonds
+    """      
+    edge = bonds-1
+
+    # Number of nodes
+    n = np.max(edge)+1
+
+    # adjacency matrix - initialize with 0
+    adjMatrix = np.zeros((n,n))
+
+    u = edge[:,0]
+    v = edge[:,1]
+    adjMatrix[u,v] = 1
+    adjMatrix[v,u] = 1
+    return adjMatrix
+
+         
+def caldistancematrix(adjMatrix): 
+    """
+    Calculate edge or 2D distance matrix from adjacency matrix
+    """   
+    nA = len(adjMatrix)
+    # Create Edge Wight Matrix with weightage of 1 for all edge
+    W = np.zeros((nA,nA))
+    idx1 = np.where(~np.eye(adjMatrix.shape[0],dtype=bool) & (adjMatrix != 1))
+    idx2 = np.where(~np.eye(adjMatrix.shape[0],dtype=bool) & (adjMatrix == 1))
+    W[idx1[0],idx1[1]] = inf
+    W[idx2[0],idx2[1]] = 1
+                    
+    # Compute the distance matrix iteratively by computation of W^2, W^3, ..., W^5
+    temp = W
+    for i in range(2,nA):
+        temp = multModSquareMatrices(temp,W)
+    disMatrix = np.array(temp)
+    return disMatrix
 
 def calgeometricdistancematrix(M):
     """
