@@ -1,0 +1,1 @@
+Provide in this forlder are the (1) experimental density and viscosity of hydrocarbons used to develop MIMO NN and (2) molecular descriptors calculated for these hydrocarbons from LAMMPS molecular dynamics simulations using PyL3dMD.
