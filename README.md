@@ -5,6 +5,9 @@ A Python-based post-processing routines, called PyL3dMD, for calculating 3D mole
 
 Cite:
 Panwar, P.; Yang, Q.; Martini, A. PyL3dMD - Python LAMMPS 3D Molecular Descriptors Package. GitHub. 2023. https://github.com/panwarp/PyL3dMD.
+Panwar, P.; Yang, Q.; Martini, A. 2023. PyL3dMD - Python LAMMPS 3D Molecular Descriptors Package. GitHub. Journal of Cheminformatics (UNDER REVIEW).
+
+
 
 ![Graphical abstract5](https://user-images.githubusercontent.com/43221759/218271367-85d6fffb-56eb-4106-b5ff-861a3140425d.png)
 
