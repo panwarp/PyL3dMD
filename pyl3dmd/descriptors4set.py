@@ -39,36 +39,40 @@ Bioinformatics, 29(8), 1092-1094.
 
 from math import pi, sqrt
 import numpy as np
+from numba import njit
 
 inc = pi * (3 - sqrt(5))
 
+@njit
 def generate_sphere_points(n):
     """
     3D coordinates of n points on a sphere using the Golden Section Spiral algorithm
     """
     offset = 2.0 / n
-
-    i = np.arange(n, dtype=float)
-
+    inc = np.pi * (3 - np.sqrt(5))
+    i = np.arange(n)
     phi = i * inc
     y = i * offset - 1.0 + (offset / 2.0)
     temp = np.sqrt(1 - y * y)
     x = np.cos(phi) * temp
     z = np.sin(phi) * temp
-    points = np.array([x, y, z]).T
+    points = np.empty((n, 3))  # Preallocate the array
+    points[:, 0] = x
+    points[:, 1] = y
+    points[:, 2] = z
     return points
 
-
+@njit
 def find_neighbor_indices(xyz, Rc, RadiusProbe, k):
     """
     Indices of atoms within probe distance to atom k
     """
-    dist = np.linalg.norm(xyz - xyz[k], axis=1)
+    dist = np.sqrt(np.sum((xyz - xyz[k])**2, axis=1))
     temp = Rc[k] + Rc + 2 * RadiusProbe
-    indices = np.arange(xyz.shape[0], dtype=int)
+    indices = np.arange(xyz.shape[0], dtype=np.int64)
     return indices[(indices != k) & (dist < temp)]
 
-
+@njit
 def calculate_asa(xyz, Rc, RadiusProbe, n_sphere_point):
     """
     Partial accessible surface areas of the atoms, using the probe and atom radius 
@@ -83,7 +87,7 @@ def calculate_asa(xyz, Rc, RadiusProbe, n_sphere_point):
         neighbor_indices = find_neighbor_indices(xyz, Rc, RadiusProbe, i)
         r = Rc[neighbor_indices] + RadiusProbe
         testpoint = sphere_points*radius[i] + xyz[i,:]
-        n_accessible_point = sum([1.0 if np.all(np.linalg.norm(xyz[neighbor_indices] - testpoint[ii], axis=1)>=r) 
+        n_accessible_point = sum([1.0 if np.all(np.sqrt(np.sum((xyz[neighbor_indices] - testpoint[ii])**2, axis=1))>=r) 
                                   else 0.0 for ii in range(n_sphere_point)])
         areas[i] = constant * (radius[i]**2) * n_accessible_point 
     return areas

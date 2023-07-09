@@ -39,9 +39,14 @@ def calwhimdescriptors(xyz, propertyValue, propertyName):
     else:
         weight = np.matrix(np.diag(propertyValue))
         
-    temp = xyzNew.T*weight*xyzNew/sum(np.diag(weight))
-    u,s,v = np.linalg.svd(temp)
-
+    if sum(np.diag(weight)) == 0:
+        temp = xyzNew.T*weight*xyzNew/sum(np.diag(weight)+1.0)
+    else:
+        temp = xyzNew.T*weight*xyzNew/sum(np.diag(weight))
+    #print(propertyValue)
+    #print(propertyName)
+    #print(temp)
+    u, s, v = np.linalg.svd(temp)
     L1 = s[0] 
     L2 = s[1]
     L3 = s[2]
