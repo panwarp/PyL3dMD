@@ -46,14 +46,14 @@ if __name__ == "__main__":
     dumpfile = locationDumpFile + '/' + dumpfilename # Your LAMMPS dump file
     
     ########################### WITHOUT OPTIONAL INPUTS #######################################
-    # PyL3dMD will find and use maximum available processors for parallel computing
+    # PyL3dMD will find and use the maximum available processors for parallel computing
     # and also calculate all descriptors if nothing is specified
     # program = pyl3dmd.pyl3dmd(datafile, dumpfile)
     
     ################################ WITHOUT INPUTS ###########################################
     # PyL3dMD will use the defined number of processors for parallel computing
     # and also calculate the defined set of descriptors if any is specified
-    program = pyl3dmd.pyl3dmd(datafilename, dumpfilename, whichdescriptors='set1', numberofcores=16)
+    program = pyl3dmd.pyl3dmd(datafile, dumpfile, whichdescriptors='set1', numberofcores=16)
     
     # Start the calculation
     program.start()
