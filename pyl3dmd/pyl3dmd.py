@@ -94,20 +94,28 @@ class pyl3dmd:
         # Get adjacency and distnace matrices
         self.eachMolsAdjMat, self.eachMolsDisMat = getadjacencyanddistancematrices.getadjANDdismatrices(self.eachMolsMass, self.eachMolsBonds)
 
+    # Create a function to save a group to a file
+    def savedata(self, i):
+        fildename = 'Molecule_' + str(i + 1) + '.csv'
+        self.splits[i][1].to_csv(fildename, index=False)
+
+
     def start(self):
         print(f"Started pool with {self.numberofcores} workers.")
         t1 = time.perf_counter()
-        items = []
+        items1 = []
+        items2 = []
         for i in range(self.numMols):
+            items2.append(i)
             for j in range(self.nframes):
-                items.append((i, j))
+                items1.append((i, j))
 
                 # create the process pool
         with mp.Pool(processes=self.numberofcores) as pool:
 
             ans = []
             # call the same function with different data in parallel
-            for result in pool.starmap(self.caldescriptors, items):
+            for result in pool.starmap(self.caldescriptors, items1):
                 # report the value to show progress
                 ans.append(result)
 
@@ -115,10 +123,10 @@ class pyl3dmd:
         df = pd.DataFrame.from_dict(ans)
 
         # split dataframe using gropuby
-        splits = list(df.groupby("molecule"))
-        for i in range(self.numMols):
-            # Dump descriptors of a molecule for all time frames
-            splits[i][1].to_csv('Molecule_' + str(i + 1) + '.csv')
+        self.splits = list(df.groupby("molecule"))
+
+        with mp.Pool(processes=self.numberofcores) as pool:
+            pool.map(self.savedata, items2)
 
         t2 = time.perf_counter()
         print(f'Finished in {t2 - t1} seconds')
