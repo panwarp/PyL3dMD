@@ -7,7 +7,6 @@ Cite:
 Panwar, P.; Yang, Q.; Martini, A. PyL3dMD - Python LAMMPS 3D Molecular Descriptors Package. GitHub. 2023. https://github.com/panwarp/PyL3dMD.
 
 Panwar, P., Yang, Q. & Martini, A. PyL3dMD: Python LAMMPS 3D molecular descriptors package. J Cheminform 15, 69 (2023). https://doi.org/10.1186/s13321-023-00737-5
-https://jcheminf.biomedcentral.com/articles/10.1186/s13321-023-00737-5#citeas
 
 
 
